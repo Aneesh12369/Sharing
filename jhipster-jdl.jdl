@@ -1,0 +1,99 @@
+
+application {
+  config {
+    baseName apiNotificationDomain,
+    applicationType monolith,
+    packageName com.dbs.griffin.notifications,
+    authenticationType jwt,
+    prodDatabaseType mariadb,
+    clientFramework no,
+    cacheProvider no,
+    enableHibernateCache false,
+    enableSwaggerCodegen true,
+    skipClient true,
+    devDatabaseType mariadb,
+    messageBroker kafka,
+    jhiPrefix deletethisprefix
+  }
+  entities *
+ 
+}
+
+entity NotificationEventsConfig(NOTIFICATION_EVENTS_CONFIG) {
+	type String required,
+    description String,
+    status Boolean
+}
+
+entity NotificationRules {
+	description String,
+    condition String,
+    templateId Integer,
+    status Boolean,
+    recipientType Integer,
+    eventTypeId Integer,
+    schedulerId Integer,
+    createdTimestamp Instant,
+    updatedTimestamp Instant
+}
+
+entity TemplateConfig {
+	description String,
+    providerTemplateId String required,
+    status Boolean required,
+    channel Integer required,
+    createdTimestamp Instant,
+    updatedTimestamp Instant
+}
+
+entity TemplateParams {
+	name String required,
+    type String,
+    path String required,
+    status Boolean required,
+    templateId Integer required,
+    apiId String,
+    createdTimestamp Instant,
+    updatedTimestamp Instant
+}
+
+entity NotificationHistory {
+	eventTypeId Integer required,
+    templateId Integer required,
+    recipientType Integer required,
+    recipientId String required,
+    status Integer required,
+    identifierField String,
+    identifierId String,
+    createdTimestamp Instant,
+    updatedTimestamp Instant
+}
+
+
+entity NotificationRecipientsConfig{
+	recipientType String required,
+    status Boolean required
+}
+
+relationship OneToMany {
+  NotificationEventsConfig to NotificationRules{eventTypeId}
+}
+
+relationship ManyToOne {
+  NotificationRules{templateId} to TemplateConfig
+}
+
+relationship OneToMany {
+  TemplateConfig to TemplateParams{templateId}
+}
+
+relationship OneToMany {
+  NotificationRecipientsConfig to NotificationHistory{recipientType}
+}
+
+dto * with mapstruct
+service * with serviceImpl
+paginate NotificationRules with pagination
+
+
+    
